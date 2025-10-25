@@ -1,0 +1,41 @@
+name: Verificar Dockerfile
+
+on:
+    push:
+        branches: ["main"]
+    pull_request:
+        branches: ["**"]
+
+jobs:
+    verify-dockerfile:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: 1. Checkout do código
+              uses: actions/checkout@v4
+
+            - name: 2. Linting do Dockerfile (Hadolint)
+              uses: hadolint/hadolint-action@v3.1.0
+              with:
+                  dockerfile: ./Dockerfile
+                  failure-threshold: warning
+
+            - name: 3. Setup do Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            - name: 4. Build da imagem (Verificar se funciona)
+              uses: docker/build-push-action@v5
+              with:
+                  context: .
+                  push: false
+                  load: true
+                  tags: local-image-test:latest
+
+            - name: 5. Scan de Vulnerabilidades (Trivy)
+              uses: aquasecurity/trivy-action@0.24.0
+              with:
+                  scan-type: "image"
+                  image-ref: "local-image-test:latest"
+                  format: "table"
+                  severity: "CRITICAL,HIGH"
+                  exit-code: "1"
