@@ -1,0 +1,20 @@
+name: TruffleHog Scan
+
+on: [push, pull_request]
+
+jobs:
+  trufflehog-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download TruffleHog v3 binary
+        run: |
+          curl -L -o trufflehog.tar.gz https://github.com/trufflesecurity/trufflehog/releases/download/v3.72.0/trufflehog_3.72.0_linux_amd64.tar.gz
+          tar -xzf trufflehog.tar.gz
+          chmod +x trufflehog
+          sudo mv trufflehog /usr/local/bin/
+
+      - name: Run TruffleHog scan
+        run: trufflehog filesystem --json .trufflehog-ignore.txt .

@@ -87,9 +87,6 @@ func handleAnalyze(c *gin.Context) {
 		return
 	}
 
-	// --- Etapa 4: Retornar o Resultado ---
-
-	// O 'scc' retorna um array de JSONs. Vamos decodificá-lo.
 	var sccResult []interface{}
 	if err := json.Unmarshal(output, &sccResult); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao decodificar JSON do scc"})
@@ -128,7 +125,6 @@ func unzip(src, dest string) error {
 			continue
 		}
 
-		// É um arquivo, cria os diretórios pais
 		if err := os.MkdirAll(filepath.Dir(fpath), os.ModePerm); err != nil {
 			return err
 		}
@@ -139,7 +135,6 @@ func unzip(src, dest string) error {
 			return err
 		}
 
-		// Abre o arquivo de dentro do .zip
 		rc, err := f.Open()
 		if err != nil {
 			outFile.Close()
